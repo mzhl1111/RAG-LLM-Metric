@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from data_annotator.base_annotator import DataAnnotator
 from data_annotator.prompt_manager import AnnotationType, AnnotatePromptManager
-from utils.constants import RAGBENCH_COL_NAMES
+from utils.constants import RAGBENCH_COL_NAMES, LLM_RESPONSE, PROMPT
 from utils.llm import LLMClient
 
 import numpy as np
@@ -22,7 +22,7 @@ class KeyPointAnnotator(DataAnnotator):
         question = row[RAGBENCH_COL_NAMES.QUESTION.value]
         golden_answer = row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value]
         return {
-            "prompt": AnnotatePromptManager().build_prompt(
+            PROMPT: AnnotatePromptManager().build_prompt(
                 question=question,
                 golden_answer=golden_answer,
                 eval_type=AnnotationType.KEY_POINT_EXTRACTION,
@@ -30,14 +30,14 @@ class KeyPointAnnotator(DataAnnotator):
         }
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert processed.get("prompt", None), "prompt missing"
-        processed["llm_response"] = await self.llm.a_generate(prompt=processed["prompt"])
+        assert processed.get(PROMPT, None), "prompt missing"
+        processed[LLM_RESPONSE] = await self.llm.a_generate(prompt=processed[PROMPT])
         return processed
 
     def post_process(self, processed: Dict, row: Dict) -> Dict:
         try:
             # Clean response and parse JSON
-            response_text = processed["llm_response"].strip().replace("```json", "").replace("```", "")
+            response_text = processed[LLM_RESPONSE].strip().replace("```json", "").replace("```", "")
             result = json.loads(response_text)
             return {"key_points": result["key_points"]}
         except (json.JSONDecodeError, KeyError) as e:
@@ -70,7 +70,7 @@ class MistakeAnswerGenerator(DataAnnotator):
         pass
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        return await self.llm.a_generate(processed=processed["prompt"])
+        return await self.llm.a_generate(processed=processed[PROMPT])
 
     def post_process(self, processed: Dict, row: Dict) -> Dict:
         pass

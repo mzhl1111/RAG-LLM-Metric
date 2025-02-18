@@ -6,7 +6,7 @@ from evaluator.prompt_manager import EvaluationType, EvalPromptManager
 from sentence_transformers import SentenceTransformer, util
 
 from utils.llm import LLMClient
-from utils.constants import RAGBENCH_COL_NAMES
+from utils.constants import RAGBENCH_COL_NAMES, LLM_RESPONSE, PROMPT
 
 
 # TODO: add AnswerEquivalenceEvaluatorWithBert
@@ -21,7 +21,7 @@ class AnswerEquivalenceEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["equivalence"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
@@ -29,12 +29,12 @@ class AnswerEquivalenceEvaluator(RAGEvaluator):
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -100,19 +100,19 @@ class RefusalAccuracyEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["refusal_accuracy"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -180,19 +180,19 @@ class LearningFacilitationEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["learning_facilitation_score", "educational_strengths", "areas_for_improvement"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -249,19 +249,19 @@ class EngagementEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["engagement_score", "engaging_elements", "suggestions_for_improvement"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -323,19 +323,19 @@ class ContextRelevanceEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["relevance_score"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -384,19 +384,19 @@ class FactualCorrectnessEvaluator(RAGEvaluator):
         self.EVAL_SCORE_PREFIX = "factual_correctness"
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {f"{self.EVAL_SCORE_PREFIX}_{key}": result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -514,7 +514,7 @@ class KeyPointEvaluator(RAGEvaluator):
         self.EVAL_SCORE_PREFIX = "key_point"
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
@@ -522,12 +522,12 @@ class KeyPointEvaluator(RAGEvaluator):
         ), "num_key_points": len(row[RAGBENCH_COL_NAMES.KEY_POINTS.value])}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(llm_response=processed['llm_response'], num_key_points=processed['num_key_points'])
+        result = self.post_process(llm_response=processed[LLM_RESPONSE], num_key_points=processed['num_key_points'])
         try:
             return {f"{self.EVAL_SCORE_PREFIX}_{key}": result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -603,19 +603,19 @@ class AdherenceFaithfulnessEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["faithfulness_score", "unfaithful_segments"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         )}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
@@ -671,19 +671,19 @@ class ContextUtilizationEvaluator(RAGEvaluator):
         self.EVAL_COLUMNS = ["faithfulness_score", "unfaithful_segments"]
 
     def pre_process_row(self, row: Dict) -> Dict:
-        return {'prompt': self.pre_process(
+        return {PROMPT: self.pre_process(
             question=row[RAGBENCH_COL_NAMES.QUESTION.value],
             context=row[RAGBENCH_COL_NAMES.CONTEXT.value],
             answer=row[RAGBENCH_COL_NAMES.GOLDEN_ANSWER.value],  # TODO: ragbench golden answer should be re-considered
         ), "context": row[RAGBENCH_COL_NAMES.CONTEXT.value]}
 
     async def a_call_llm(self, processed: Dict) -> Dict:
-        assert 'prompt' in processed, f'Prompt missing'
-        processed['llm_response'] = await self.llm.a_generate(processed['prompt'])
+        assert PROMPT in processed, f'Prompt missing'
+        processed[LLM_RESPONSE] = await self.llm.a_generate(processed[PROMPT])
         return processed
 
     def post_process_row(self, processed: Dict, row: Dict) -> Dict:
-        result = self.post_process(processed['llm_response'])
+        result = self.post_process(processed[LLM_RESPONSE])
         try:
             return {key: result[key] for key in self.EVAL_COLUMNS}
         except KeyError:
