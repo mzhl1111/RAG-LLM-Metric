@@ -29,7 +29,7 @@ class DataAnnotator(ABC):
         """
         async with semaphore:
             processed = self.pre_process(row)
-            response = await self.call_llm(processed)
+            response = await self.a_call_llm(processed)
             return self.post_process(response, row)
 
     @abstractmethod
@@ -38,11 +38,11 @@ class DataAnnotator(ABC):
         pass
 
     @abstractmethod
-    async def call_llm(self, processed_dict: Dict) -> str:
+    async def a_call_llm(self, processed_dict: Dict) -> Dict:
         """Call LLM with formatted prompt"""
         pass
 
     @abstractmethod
-    def post_process(self, response: str, example: Dict) -> Dict:
+    def post_process(self, processed: Dict, row: Dict) -> Dict:
         """Process LLM response into final format"""
         pass

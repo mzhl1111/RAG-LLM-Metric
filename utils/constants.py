@@ -1,5 +1,7 @@
 from enum import Enum
 
+
+LLM_RESPONSE = "llm_response"
 class RAGBENCH_COL_NAMES(Enum):
     GOLDEN_ANSWER = "response"
     QUESTION = "question"
